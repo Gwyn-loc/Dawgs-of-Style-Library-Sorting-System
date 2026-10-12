@@ -1,10 +1,6 @@
 
-import os
 import turtle
 from datetime import datetime
-
-# Set the Command Prompt window title
-os.system("title Sorting System")
 
 # Store the library books and their information
 books = {
