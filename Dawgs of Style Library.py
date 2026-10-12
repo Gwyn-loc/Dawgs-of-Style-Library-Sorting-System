@@ -3,8 +3,10 @@ import os
 import turtle
 from datetime import datetime
 
+# Set the Command Prompt window title
 os.system("title Sorting System")
 
+# Store the library books and their information
 books = {
     101: {
         "title": "The Hobbit",
@@ -69,6 +71,7 @@ books = {
 }
 
 
+# Display all books and their availability
 def display_catalog():
     print("\n" + "=" * 75)
     print("                  DAWGS OF STYLE LIBRARY CATALOG")
@@ -76,6 +79,7 @@ def display_catalog():
     print(f"{'CATALOG NO.':<15}{'BOOK TITLE':<38}{'CATEGORY':<22}")
     print("-" * 75)
 
+    # Go through each book in the catalog
     for number, book in books.items():
         status = "Available" if book["available"] else "Borrowed"
 
@@ -89,11 +93,13 @@ def display_catalog():
     print("=" * 75)
 
 
+# Ask the borrower for their name and selected books
 def borrow_books():
     borrowed_books = []
 
     print("\nWelcome to the Library Book Borrowing System!")
 
+    # Make sure the borrower enters a name
     while True:
         name = input("\nEnter the borrower's full name: ").strip()
 
@@ -102,6 +108,7 @@ def borrow_books():
 
         print("Name cannot be empty. Please try again.")
 
+    # Allow the borrower to select books by catalog number
     while True:
         display_catalog()
 
@@ -113,25 +120,30 @@ def borrow_books():
 
         choice = input("Catalog number: ").strip()
 
+        # Check whether the input contains only digits
         if not choice.isdigit():
             print("Invalid input. Please enter a number.")
             continue
 
         catalog_number = int(choice)
 
+        # Stop selecting books when the borrower enters 0
         if catalog_number == 0:
             break
 
+        # Check whether the catalog number exists
         if catalog_number not in books:
             print("That catalog number does not exist.")
             continue
 
         book = books[catalog_number]
 
+        # Prevent borrowing a book that is unavailable
         if not book["available"]:
             print("Sorry, this book is currently unavailable.")
             continue
 
+        # Prevent selecting the same book more than once
         if any(
             item["catalog_number"] == catalog_number
             for item in borrowed_books
@@ -139,6 +151,7 @@ def borrow_books():
             print("You have already selected this book.")
             continue
 
+        # Add the selected book to the borrowing list
         borrowed_books.append({
             "catalog_number": catalog_number,
             "title": book["title"],
@@ -146,14 +159,17 @@ def borrow_books():
             "category": book["category"]
         })
 
+        # Mark the selected book as unavailable
         book["available"] = False
 
         print(f"\nSuccessfully selected: {book['title']}")
 
+    # Cancel the transaction if no books were selected
     if not borrowed_books:
         print("\nNo books were selected. Transaction cancelled.")
         return
 
+    # Display the borrowing summary in the terminal
     print("\n" + "=" * 50)
     print("             BORROWING SUMMARY")
     print("=" * 50)
@@ -169,28 +185,35 @@ def borrow_books():
     print("=" * 50)
     print("\nGenerating your Turtle receipt...")
 
+    # Open the graphical receipt
     generate_receipt(name, borrowed_books)
 
 
+# Create a graphical receipt using Python Turtle
 def generate_receipt(name, borrowed_books):
+    # Get the current date and time
     receipt_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    height = max(600, 330 + len(borrowed_books) * 65)
+    # Increase the receipt height for additional books
+    height = max(650, 390 + len(borrowed_books) * 105)
 
     screen = turtle.Screen()
     screen.title("Library Borrowing Receipt")
-    screen.setup(width=850, height=min(height, 1000))
+    screen.setup(width=850, height=height)
     screen.bgcolor("#F5F1E8")
     screen.tracer(0)
 
+    # Create the turtle used to draw and write the receipt
     pen = turtle.Turtle()
     pen.hideturtle()
     pen.speed(0)
     pen.penup()
 
-    window_height = min(height, 1000)
+    # Calculate the receipt's top position
+    window_height = height
     top = window_height // 2 - 35
 
+    # Write text at a specified position on the receipt
     def write_line(x, y, text, size=12, bold=False, align="left"):
         pen.goto(x, y)
         pen.color("#263238")
@@ -200,6 +223,7 @@ def generate_receipt(name, borrowed_books):
             font=("Arial", size, "bold" if bold else "normal")
         )
 
+    # Draw the outer border of the receipt
     pen.goto(-370, top)
     pen.pendown()
     pen.pensize(3)
@@ -212,14 +236,17 @@ def generate_receipt(name, borrowed_books):
 
     pen.penup()
 
+    # Write the receipt heading
     write_line(0, top - 45, "DAWGS OF STYLE LIBRARY", 23, True, "center")
     write_line(0, top - 75, "BOOK BORROWING RECEIPT", 15, True, "center")
 
+    # Draw a line beneath the heading
     pen.goto(-340, top - 95)
     pen.pendown()
     pen.goto(340, top - 95)
     pen.penup()
 
+    # Display the borrower's information
     y = top - 125
 
     write_line(-335, y, f"Borrower: {name}", 13, True)
@@ -231,6 +258,7 @@ def generate_receipt(name, borrowed_books):
     write_line(-335, y, "BORROWED BOOKS", 13, True)
     y -= 30
 
+    # List each borrowed book and its details
     for index, item in enumerate(borrowed_books, start=1):
         write_line(
             -335, y,
@@ -253,6 +281,7 @@ def generate_receipt(name, borrowed_books):
         )
         y -= 32
 
+    # Draw a line above the borrowing total
     pen.goto(-340, y)
     pen.pendown()
     pen.goto(340, y)
@@ -260,6 +289,7 @@ def generate_receipt(name, borrowed_books):
 
     y -= 35
 
+    # Display the total number of books borrowed
     write_line(
         0, y,
         f"TOTAL BOOKS BORROWED: {len(borrowed_books)}",
@@ -268,9 +298,10 @@ def generate_receipt(name, borrowed_books):
 
     y -= 38
 
+    # Add a thank-you message at the bottom
     write_line(
         0, y,
-        "Thank you for your patronage my guy !",
+        "Thank you for your patronage my guy!",
         12, False, "center"
     )
 
@@ -282,12 +313,14 @@ def generate_receipt(name, borrowed_books):
         10, False, "center"
     )
 
+    # Display the completed receipt
     screen.update()
     print("\nReceipt displayed. Close the Turtle window to exit.")
 
     turtle.done()
 
 
+# Display the main menu and handle the user's choice
 def main():
     while True:
         print("\n" + "=" * 45)
@@ -299,14 +332,20 @@ def main():
 
         option = input("Select an option: ").strip()
 
+        # Open the borrowing system
         if option == "1":
             borrow_books()
+
+        # Exit the program
         elif option == "2":
             print("\nThank you for visiting the library!")
             break
+
+        # Handle invalid menu selections
         else:
             print("Invalid option. Please choose 1 or 2.")
 
 
+# Start the program
 if __name__ == "__main__":
     main()
